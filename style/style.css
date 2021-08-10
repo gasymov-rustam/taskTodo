@@ -136,3 +136,33 @@ table {
     padding: 0;
     box-sizing: border-box;
 }
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 0 15px;
+    margin: 50px auto;
+}
+
+.container h2 {
+    font-size: 24px;
+    text-align: center;
+    margin: 10px;
+}
+
+.createToDoList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.createToDoList [placeholder] {
+    padding: 5px;
+}
+
+.createToDoList textarea {
+    resize: none;
+}

@@ -1,16 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="preload" href="./style/css.css" as="style">
+    <link rel="preload" href="./style/style.css" as="style">
     <meta charset="UTF-8">
     <title>List To Do</title>
     <meta name="description" content="list to do, home work">
     <!-- <meta name="keywords" content="list, to do"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./style/css">
+    <link rel="stylesheet" href="./style/style.css">
     <script src="./js/app.js" defer></script>
 </head>
 <body>
+
+    <div class="container">
+        <form class="createToDoList" id="createToDoList">
+            <h2>Add new todo</h2>
+            <input type="text" name="title" placeholder="title">
+            <textarea name="body" placeholder="Body"></textarea>
+            <button type="submit">add task</button>
+        </form>
+        <h2 class="todos-title">Todo List</h2>
+        <div class="todos" id="todos">
+        </div>
+    </div>
 
 </body>
 </html>
