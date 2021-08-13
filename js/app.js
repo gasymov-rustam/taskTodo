@@ -25,6 +25,7 @@ resultPrintEl.addEventListener('click', e=> {
             todos.splice(todoIDX, 1);
         }
         renderTodos(resultPrintEl, todos);
+        if (todos.length !==0) resultPrintEl.insertAdjacentHTML('afterbegin', `<h2 class="todos-title">Todo List</h2>`)
     }
 })
 
@@ -40,8 +41,9 @@ createFormEl.addEventListener('submit', e=> {
     }
     todos.push(newTodo);
     renderTodos(resultPrintEl, todos);
-    e.target.reset();
     resultPrintEl.insertAdjacentHTML('afterbegin', `<h2 class="todos-title">Todo List</h2>`)
+    e.target.reset();
+    
 })
 
 function renderTodos(section, todos){
