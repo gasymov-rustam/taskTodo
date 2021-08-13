@@ -15,51 +15,51 @@ resultPrintEl.addEventListener('click', e=> {
     const btn = e.target.closest('button');
     if (btn) {
         const action = btn.dataset.action;
-        const todoClass = btn.closest('.todo');
-        const todoId = +todoClass.dataset.id;
-        const todoIdx = todos.findIndex(todo => todoId === todo.id);
+        const todoClass= btn.closest('.todo');
+        const todoID = parseInt(todoClass.dataset.id);
+        const todoIDX = todos.findIndex(todo => todo.id === todoID);
         if (action === 'done') {
-            todos[todoIdx].updateAT = Date.now();
-            todos[todoIdx].done = true;
+            todos[todoIDX].updateAT = Date.now();
+            todos[todoIDX].done = true;
         } else if (action === 'delete') {
-            todos.splice(todoIdx, 1)
+            todos.splice(todoIDX, 1);
         }
         renderTodos(resultPrintEl, todos);
     }
 })
 
-createFormEl.addEventListener('submit', e => {
+createFormEl.addEventListener('submit', e=> {
     e.preventDefault();
-    const newTodo = {
+    const newTodo ={
         id: Date.now(),
         title: e.target.title.value,
         body: e.target.body.value,
-        createdAt: Date.now(),
+        createdAT: Date.now(),
         updateAT: null,
-        done: false,
+        done: false
     }
     todos.push(newTodo);
     renderTodos(resultPrintEl, todos);
     e.target.reset();
-    console.log(todos);
+    resultPrintEl.insertAdjacentHTML('afterbegin', `<h2 class="todos-title">Todo List</h2>`)
 })
 
-function renderTodos(section, arr) {
-    section.innerHTML = createTodosHtml(arr).join('');
+function renderTodos(section, todos){
+    section.innerHTML = createTodosHTML(todos).join('');
 }
 
-function createTodosHtml(todos) {
-    return todos.map(todo => createTodoHtml(todo));
+function createTodosHTML(todos) {
+    return todos.map(todo => createTodoHTML(todo));
 }
 
-function createTodoHtml(todo) {
+function createTodoHTML(todo){
     return `<div class="todo" data-id="${todo.id}">
                 <h2>${todo.title}</h2>
-                ${todo.body ? `<p>${todo.body}</p>`: ''}
-                ${todo.done ? `<button data-action="delete">Delete</button>`:`<button data-action="done">Done</button>`}
+                ${todo.body ? `<p>${todo.body}</p>` : true}
                 <div>
-                    <time>${new Date(todo.createdAt).toLocaleString()}</time>
-                    ${todo.updateAT ? `<time>${new Date(todo.updateAT).toLocaleString()}</time>`: ''}
+                    <time>Created: ${new Date(todo.createdAT).toLocaleString()}</time>
+                    ${todo.updateAT? `<time>Update: : ${new Date(todo.updateAT).toLocaleString()}</time>` : ''}
                 </div>
+                ${todo.done ? `<button data-action="delete">Delete</button>` : `<button data-action="done">Done</button>`}
             </div>`
 }
