@@ -137,13 +137,37 @@ table {
     box-sizing: border-box;
 }
 
-.container {
-    width: 100%;
-    max-width: 600px;
-    border: 1px solid black;
+button {
     border-radius: 4px;
-    padding: 0 15px;
-    margin: 50px auto;
+    background-color:lightgrey;
+    border: 1ps solid darkgrey;
+    padding: 4px 6px;
+}
+
+time {
+    font-size: 10px;
+}
+
+h2 {
+    overflow: hidden;
+}
+
+h3 {
+    font-style: italic;
+    font-size: 12px;
+}
+
+.todoList-wrap {
+    display: flex;
+}
+
+.container, .containerNew, .containerProgress, .containerDelete {
+    width: 100%;
+    max-width: 200px;
+    border-radius: 4px;
+    padding: 0 5px;
+    margin: 50px;
+    border: 1px solid black;
 }
 
 .container h2 {
@@ -169,9 +193,10 @@ table {
 
 .createToDoList textarea {
     resize: none;
+    min-height: 100px;
 }
 
-.todo {
+.todoTask {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -180,6 +205,18 @@ table {
     border-radius: 4px;
     padding: 5px;
     margin: 10px auto;
+}
+
+.todoTask.new {
+    background-color: azure;
+}
+
+.todoTask.progress {
+    background-color: rgb(224, 247, 183);
+}
+
+.todoTask.done {
+    background-color: rgb(196, 69, 19);
 }
 
 .todo h2, p{
@@ -191,7 +228,14 @@ table {
     margin: 0 auto;
 }
 
-.todos > h2 {
-    margin-top: 20px;
+.todos-title, .createToDoList-title {
+    font-size: 24px;
+    text-align: center;
 }
 
+.container-wrap {
+    border-radius: 4px;
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+}

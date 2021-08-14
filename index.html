@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="preload" href="./style/style.css" as="style">
     <meta charset="UTF-8">
@@ -10,19 +11,35 @@
     <link rel="stylesheet" href="./style/style.css">
     <script src="./js/app.js" defer></script>
 </head>
-<body>
 
-    <div class="container">
-        <form class="createToDoList" id="createToDoList">
+<body>
+    <div class="todoList-wrap" id="wrap">
+        <div class="container">
             <h2 class="createToDoList-title">Add new todo</h2>
-            <input type="text" name="title" placeholder="title">
-            <textarea name="body" placeholder="Body"></textarea>
-            <button type="submit">add task</button>
-        </form>
-        <!-- <h2 class="todos-title">Todo List</h2> -->
-        <div class="todos" id="todos">
+            <form class="createToDoList" id="createToDoList">
+                <input type="text" name="title" placeholder="title">
+                <textarea name="body" placeholder="Body"></textarea>
+                <button type="submit">add task</button>
+            </form>
+        </div>
+
+        <div class="container-wrap" id="wrap">
+            <div class="containerNew">
+                <h2 class="todos-title">New Tasks</h2>
+                <div class="todo" id="todosNew"></div>
+            </div>
+
+            <div class="containerProgress">
+                <h2 class="todos-title">Tasks in progress</h2>
+                <div class="todo" id="todosProgress"></div>
+            </div>
+
+            <div class="containerDelete">
+                <h2 class="todos-title">Tasks to delete</h2>
+                <div class="todo" id="todos"></div>
+            </div>
         </div>
     </div>
-
 </body>
+
 </html>
