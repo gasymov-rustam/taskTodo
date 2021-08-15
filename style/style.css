@@ -161,13 +161,12 @@ h3 {
     display: flex;
 }
 
-.container, .containerNew, .containerProgress, .containerDelete {
+.container {
     width: 100%;
     max-width: 200px;
     border-radius: 4px;
     padding: 0 5px;
     margin: 50px;
-    border: 1px solid black;
 }
 
 .container h2 {

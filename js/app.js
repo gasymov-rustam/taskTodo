@@ -6,43 +6,46 @@
 //     createdAt: 160542151043,
 //     updatedAt: null
 // }
-const todos = JSON.parse(window.localStorage.getItem('todos'));
+// let todos = JSON.parse(window.localStorage.getItem('todos'));
 const createFormEl = document.getElementById('createToDoList');
-const resultPrintEl = document.getElementById('todosNew');
+const todosNew = document.getElementById('todosNew');
 const todosProgress = document.getElementById('todosProgress');
-const wrap = document.getElementById('wrap')
+const todosDelete = document.getElementById('todosDelete');
+const wrapTodoList = document.getElementById('wrapTodoList');
+let todos = [];
 
-if (!window.localStorage.getItem('todos')) {
+/* if (!window.localStorage.getItem('todos')) {
     window.localStorage.setItem('todos', JSON.stringify([]))
 
 } else {
     renderTodos(resultPrintEl, JSON.parse(window.localStorage.getItem('todos')));
-}
+} */
 
-resultPrintEl.addEventListener('click', e => {
+wrapTodoList.addEventListener('click', e => {
     const btn = e.target.closest('button');
     if (btn) {
         const action = btn.dataset.action;
         const todoClass = btn.closest('.todoTask');
-        const todoID = parseInt(todoClass.dataset.id);
+        const todoID = +todoClass.dataset.id;
         const todoIDX = todos.findIndex(todo => todo.id === todoID);
         if (action === 'progress' || action === 'done') {
             todos[todoIDX].updateAT = Date.now();
             todos[todoIDX].status++;
-        } else if (action === 'delete') {
+        } else {
             todos.splice(todoIDX, 1);
         }
-        window.localStorage.setItem('todos', JSON.stringify(todos))
-        renderTodos(resultPrintEl, JSON.parse(window.localStorage.getItem('todos')));
-        todos.filter( field => {
-            if (field.status === 1) return renderTodos(todosProgress, field);
-        })
-        // console.log(todos.filter(field => field.status === 1))
-            /* console.log(field.status);
-            if (field.status === 1) {
-                return console.log(todos);
-            }
-        }) */
+
+        todos.sort(sortTo(todos, 'createdAT'));
+        todos.sort(sortTo(todos, 'updateAT'));
+        todos.sort(sortTo(todos, 'status'));
+        const todosStatusNew = todos.filter(todo => todo.status === 0);
+        const todosStatusProgress = todos.filter(todo => todo.status === 1);
+        const todosStatusDelete = todos.filter(todo => todo.status === 2);
+        renderTodos(todosNew, todosStatusNew);
+        renderTodos(todosProgress, todosStatusProgress);
+        renderTodos(todosDelete, todosStatusDelete);
+        // console.log(todos);
+        // renderTodos(resultPrintEl, todos);
     }
 })
 
@@ -57,9 +60,12 @@ createFormEl.addEventListener('submit', e => {
         status: 0
     }
     todos.push(newTodo);
-    renderTodos(resultPrintEl, todos);
+    todos.sort(sortTo(todos, 'createdAT'));
+    todos.sort(sortTo(todos, 'updateAT'));
+    todos.sort(sortTo(todos, 'status'));
+    renderTodos(todosNew, todos);
     e.target.reset();
-    window.localStorage.setItem('todos', JSON.stringify(todos));
+    // window.localStorage.setItem('todos', JSON.stringify(todos));
 })
 
 function renderTodos(section, todos) {
@@ -123,3 +129,36 @@ function todoStatus(status) {
     }
 }
 
+function sortTo(arr, smartKey) {
+    if (arr.length > 0 && typeof arr[0][smartKey] !== 'string') {
+        return (a, b) => a[smartKey] - b[smartKey];
+    }
+}
+
+
+// resultPrintEl.addEventListener('click', e => {
+//     const btn = e.target.closest('button');
+//     if (btn) {
+//         const action = btn.dataset.action;
+//         const todoClass = btn.closest('.todoTask');
+//         const todoID = parseInt(todoClass.dataset.id);
+//         const todoIDX = todos.findIndex(todo => todo.id === todoID);
+//         if (action === 'progress' || action === 'done') {
+//             todos[todoIDX].updateAT = Date.now();
+//             todos[todoIDX].status++;
+//         } else if (action === 'delete') {
+//             todos.splice(todoIDX, 1);
+//         }
+//         window.localStorage.setItem('todos', JSON.stringify(todos))
+//         renderTodos(resultPrintEl, JSON.parse(window.localStorage.getItem('todos')));
+//         todos.filter( field => {
+//             if (field.status === 1) return renderTodos(todosProgress, field);
+//         })
+//         // console.log(todos.filter(field => field.status === 1))
+//             /* console.log(field.status);
+//             if (field.status === 1) {
+//                 return console.log(todos);
+//             }
+//         }) */
+//     }
+// })
