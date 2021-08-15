@@ -6,20 +6,18 @@
 //     createdAt: 160542151043,
 //     updatedAt: null
 // }
-// let todos = JSON.parse(window.localStorage.getItem('todos'));
 const createFormEl = document.getElementById('createToDoList');
 const todosNew = document.getElementById('todosNew');
 const todosProgress = document.getElementById('todosProgress');
 const todosDelete = document.getElementById('todosDelete');
 const wrapTodoList = document.getElementById('wrapTodoList');
-let todos = [];
 
-/* if (!window.localStorage.getItem('todos')) {
+if (!window.localStorage.getItem('todos')) {
     window.localStorage.setItem('todos', JSON.stringify([]))
+}
 
-} else {
-    renderTodos(resultPrintEl, JSON.parse(window.localStorage.getItem('todos')));
-} */
+let todos = JSON.parse(window.localStorage.getItem('todos'));
+createRenderByStatus(todos, todosNew, todosProgress, todosDelete);
 
 wrapTodoList.addEventListener('click', e => {
     const btn = e.target.closest('button');
@@ -38,14 +36,8 @@ wrapTodoList.addEventListener('click', e => {
         todos.sort(sortTo(todos, 'createdAT'));
         todos.sort(sortTo(todos, 'updateAT'));
         todos.sort(sortTo(todos, 'status'));
-        const todosStatusNew = todos.filter(todo => todo.status === 0);
-        const todosStatusProgress = todos.filter(todo => todo.status === 1);
-        const todosStatusDelete = todos.filter(todo => todo.status === 2);
-        renderTodos(todosNew, todosStatusNew);
-        renderTodos(todosProgress, todosStatusProgress);
-        renderTodos(todosDelete, todosStatusDelete);
-        // console.log(todos);
-        // renderTodos(resultPrintEl, todos);
+        createRenderByStatus(todos, todosNew, todosProgress, todosDelete);
+        window.localStorage.setItem('todos', JSON.stringify(todos));
     }
 })
 
@@ -65,7 +57,7 @@ createFormEl.addEventListener('submit', e => {
     todos.sort(sortTo(todos, 'status'));
     renderTodos(todosNew, todos);
     e.target.reset();
-    // window.localStorage.setItem('todos', JSON.stringify(todos));
+    window.localStorage.setItem('todos', JSON.stringify(todos));
 })
 
 function renderTodos(section, todos) {
@@ -92,14 +84,28 @@ function createTodoHTML(todo) {
 
     return `<div class="todoTask ${todoStatus(todo.status)}" data-id="${todo.id}">
                 ${todo.title ? `<h2>${todo.title}</h2>` : ''}
-                <h3>status: ${todoStatus(todo.status)}</h3>
                 ${todo.body ? `<p>${todo.body}</p>` : ''}
+                <h3>status: ${todoStatus(todo.status)}</h3>
                 <div>
                     <time>Created: ${new Date(todo.createdAT).toLocaleString()}</time>
                     ${todo.updatedAt ? `<time>Updated: ${new Date(todo.updatedAt).toLocaleString()}</time>` : ''}
                 </div>
                 ${actionBtn}
             </div>`
+}
+
+function createRenderByStatus(arr, sectionFirst, sectionSecond, sectionThird) {
+    /* arr.filter (todo => {
+        if (todo.status === 0) return renderTodos(todo, sectionFirst);
+        if (todo.status === 1) return renderTodos(todo, sectionSecond);
+        if (todo.status === 2) return renderTodos(todo, sectionThird);
+    }) */
+    const todosStatusNew = arr.filter(todo => todo.status === 0);
+    const todosStatusProgress = arr.filter(todo => todo.status === 1);
+    const todosStatusDelete = arr.filter(todo => todo.status === 2);
+    renderTodos(sectionFirst, todosStatusNew);
+    renderTodos(sectionSecond, todosStatusProgress);
+    renderTodos(sectionThird, todosStatusDelete);
 }
 
 function todoStatus(status) {

@@ -220,11 +220,14 @@ h3 {
 
 .todo h2, p{
     width: 100%;
-    padding: 0 15px;
-    border: 1px solid black;
+    font-size: 18px;
     border-radius: 4px;
     text-align: left;
     margin: 0 auto;
+}
+
+.todo p {
+    font-size: 16px;
 }
 
 .todos-title, .createToDoList-title {
