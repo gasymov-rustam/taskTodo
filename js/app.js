@@ -1,170 +1,226 @@
-// const todo = {
-//     id: 1,
-//     title: 'Todo title',
-//     body: 'Todo text',
-//     done: false,
-//     createdAt: 160542151043,
-//     updatedAt: null
-// }
-const createFormEl = document.getElementById('createToDoList');
-const todosNew = document.getElementById('todosNew');
-const todosProgress = document.getElementById('todosProgress');
-const todosDelete = document.getElementById('todosDelete');
-const wrapTodoList = document.getElementById('wrapTodoList');
+const createFormEl = document.getElementById("createToDoList");
+const todosNew = document.getElementById("todosNew");
+const todosProgress = document.getElementById("todosProgress");
+const todosDelete = document.getElementById("todosDelete");
+const wrapTodoList = document.getElementById("wrapTodoList");
 
-if (!window.localStorage.getItem('todos')) {
-    window.localStorage.setItem('todos', JSON.stringify([]))
+if (!window.localStorage.getItem("todos")) {
+    window.localStorage.setItem("todos", JSON.stringify([]));
 }
 
-let todos = JSON.parse(window.localStorage.getItem('todos'));
-createRenderByStatus(todos, todosNew, todosProgress, todosDelete);
+let todos = JSON.parse(window.localStorage.getItem("todos"));
 
-wrapTodoList.addEventListener('click', e => {
-    const btn = e.target.closest('button');
-    if (btn) {
-        const action = btn.dataset.action;
-        const todoClass = btn.closest('.todoTask');
-        const todoID = +todoClass.dataset.id;
-        const todoIDX = todos.findIndex(todo => todo.id === todoID);
-        if (action === 'progress' || action === 'done') {
-            todos[todoIDX].updateAT = Date.now();
-            todos[todoIDX].status++;
+renderByTodos(todos, todosNew, todosProgress, todosDelete);
+
+wrapTodoList.addEventListener("click", (e) => {
+    const currentBtn = e.target.closest("button");
+    if (currentBtn) {
+        const action = currentBtn.dataset.action;
+        const todoId = Number(currentBtn.closest(".todoTask").dataset.id);
+        const todoIdx = todos.findIndex((todo) => todo.id === todoId);
+        if (action === "new" || action === "progress") {
+            todos[todoIdx].updatedAt = Date.now();
+            todos[todoIdx].status++;
         } else {
-            todos.splice(todoIDX, 1);
+            todos.splice(todoIdx, 1);
         }
-
-        todos.sort(sortTo(todos, 'createdAT'));
-        todos.sort(sortTo(todos, 'updateAT'));
-        todos.sort(sortTo(todos, 'status'));
-        createRenderByStatus(todos, todosNew, todosProgress, todosDelete);
-        window.localStorage.setItem('todos', JSON.stringify(todos));
+        todos.sort((a, b) => a.title.localeCompare(b.title) || a.createdAt - b.createdAt || a.updatedAt - b.udatedAt);
+        renderByTodos(todos, todosNew, todosProgress, todosDelete);
+        window.localStorage.setItem("todos", JSON.stringify(todos));
     }
-})
+});
 
-createFormEl.addEventListener('submit', e => {
+createFormEl.addEventListener("submit", (e) => {
     e.preventDefault();
-    const newTodo = {
-        id: Date.now(),
-        title: e.target.title.value,
-        body: e.target.body.value,
-        createdAT: Date.now(),
-        updateAT: null,
-        status: 0
-    }
+    const newTodo = new Todo(e.target.title.value, e.target.title.value);
     todos.push(newTodo);
-    todos.sort(sortTo(todos, 'createdAT'));
-    todos.sort(sortTo(todos, 'updateAT'));
-    todos.sort(sortTo(todos, 'status'));
-    renderTodos(todosNew, todos);
+    todos.sort((a, b) => a.title.localeCompare(b.title) || a.createdAt - b.createdAt || a.updatedAt - b.udatedAt);
+    const columnFirst = todos.filter((todo) => todo.status === 0);
+    renderTodos(todosNew, columnFirst);
+    window.localStorage.setItem("todos", JSON.stringify(todos));
     e.target.reset();
-    window.localStorage.setItem('todos', JSON.stringify(todos));
-})
+});
 
-function renderTodos(section, todos) {
-    section.innerHTML = createTodosHTML(todos).join('');
+function renderTodos(elem, array) {
+    elem.innerHTML = createTodosHTML(array).join("");
 }
 
 function createTodosHTML(todos) {
-    return todos.map(todo => createTodoHTML(todo));
+    return todos.map((todo) => createTodoHTML(todo));
 }
 
 function createTodoHTML(todo) {
-    let actionBtn = ''
+    let actionBtn = "";
     switch (todo.status) {
         case 0:
-            actionBtn = '<button data-action="progress">Set in progress!</button>'
+            actionBtn = `<button data-action="new">Set in progress!</button>`;
             break;
         case 1:
-            actionBtn = '<button data-action="done">Set it done!</button>'
+            actionBtn = `<button data-action="progress">Set in done!</button>`;
             break;
         case 2:
-            actionBtn = '<button data-action="delete">Delete!</button>'
+            actionBtn = `<button data-action="done">Delete!</button>`;
             break;
     }
 
-    return `<div class="todoTask ${todoStatus(todo.status)}" data-id="${todo.id}">
-                ${todo.title ? `<h2>${todo.title}</h2>` : ''}
-                ${todo.body ? `<p>${todo.body}</p>` : ''}
-                <h3>status: ${todoStatus(todo.status)}</h3>
-                <div>
-                    <time>Created: ${new Date(todo.createdAT).toLocaleString()}</time>
-                    ${todo.updatedAt ? `<time>Updated: ${new Date(todo.updatedAt).toLocaleString()}</time>` : ''}
-                </div>
+    return `<div class="todoTask ${createTodoStatus(todo.status)}" data-id="${todo.id}">
+                <h2>${todo.title}</h2>
+                ${todo.body ? `<p>${todo.body}</p>` : ""}
+                <p>status: ${createTodoStatus(todo.status)}</p>
+                <time>Created: ${new Date(todo.createdAt).toDateString()}</time>
+                ${todo.updated ? `<time>Updated: ${new Date(todo.updatedAt).toDateString()}</time>` : ""}
                 ${actionBtn}
-            </div>`
+            </div>`;
 }
 
-function createRenderByStatus(arr, sectionFirst, sectionSecond, sectionThird) {
-    /* arr.filter (todo => {
-        if (todo.status === 0) return renderTodos(todo, sectionFirst);
-        if (todo.status === 1) return renderTodos(todo, sectionSecond);
-        if (todo.status === 2) return renderTodos(todo, sectionThird);
-    }) */
-    const todosStatusNew = arr.filter(todo => todo.status === 0);
-    const todosStatusProgress = arr.filter(todo => todo.status === 1);
-    const todosStatusDelete = arr.filter(todo => todo.status === 2);
-    renderTodos(sectionFirst, todosStatusNew);
-    renderTodos(sectionSecond, todosStatusProgress);
-    renderTodos(sectionThird, todosStatusDelete);
+function Todo(title, body) {
+    this.id = Date.now();
+    this.title = title;
+    this.body = body;
+    this.status = 0;
+    this.createdAt = this.id;
+    this.udatedAt = null;
 }
 
-function todoStatus(status) {
+function createTodoStatus(status) {
     if (!isNaN(Number(status))) {
         switch (Number(status)) {
             case 0:
-                return 'new'
+                return "new";
             case 1:
-                return 'progress'
+                return "progress";
             case 2:
-                return 'done'
+                return "done";
             default:
-                throw 'Unknown command'
+                throw "Unknown command";
         }
     } else {
         switch (status) {
-            case 'new':
-                return 0
-            case 'progress':
-                return 1
-            case 'done':
-                return 2
+            case "new":
+                return 0;
+            case "progress":
+                return 1;
+            case "done":
+                return 2;
             default:
-                throw 'Unknown status!'
+                throw "Unknown command";
         }
-
     }
 }
 
-function sortTo(arr, smartKey) {
-    if (arr.length > 0 && typeof arr[0][smartKey] !== 'string') {
-        return (a, b) => a[smartKey] - b[smartKey];
-    }
+function renderByTodos(todos, sectionFirst, sectionSecond, sectionThird) {
+    const columnFirst = todos.filter((todo) => todo.status === 0);
+    const columnSecond = todos.filter((todo) => todo.status === 1);
+    const columnThird = todos.filter((todo) => todo.status === 2);
+    renderTodos(sectionFirst, columnFirst);
+    renderTodos(sectionSecond, columnSecond);
+    renderTodos(sectionThird, columnThird);
 }
 
+// if (!window.localStorage.getItem("todos")) window.localStorage.setItem("todos", JSON.stringify([]));
+// let todos = JSON.parse(window.localStorage.getItem("todos"));
 
-// resultPrintEl.addEventListener('click', e => {
-//     const btn = e.target.closest('button');
-//     if (btn) {
-//         const action = btn.dataset.action;
-//         const todoClass = btn.closest('.todoTask');
-//         const todoID = parseInt(todoClass.dataset.id);
-//         const todoIDX = todos.findIndex(todo => todo.id === todoID);
-//         if (action === 'progress' || action === 'done') {
-//             todos[todoIDX].updateAT = Date.now();
-//             todos[todoIDX].status++;
-//         } else if (action === 'delete') {
-//             todos.splice(todoIDX, 1);
+// renderByTodos(todos, todosNew, todosProgress, todosDelete);
+
+// wrapTodoList.addEventListener("click", (e) => {
+//     const currentBtn = e.target.closest("button");
+//     if (currentBtn) {
+//         const action = currentBtn.dataset.action;
+//         const todoId = +currentBtn.closest(".todoTask").dataset.id;
+//         const todoIdx = todos.findIndex((todo) => todo.id === todoId);
+//         if (action === "new" || action === "progress") {
+//             todos[todoIdx].updatedAt = Date.now();
+//             todos[todoIdx].status++;
+//         } else {
+//             todos.splice(todoIdx, 1);
 //         }
-//         window.localStorage.setItem('todos', JSON.stringify(todos))
-//         renderTodos(resultPrintEl, JSON.parse(window.localStorage.getItem('todos')));
-//         todos.filter( field => {
-//             if (field.status === 1) return renderTodos(todosProgress, field);
-//         })
-//         // console.log(todos.filter(field => field.status === 1))
-//             /* console.log(field.status);
-//             if (field.status === 1) {
-//                 return console.log(todos);
-//             }
-//         }) */
+//         renderByTodos(todos, todosNew, todosProgress, todosDelete);
+//         window.localStorage.setItem("todos", JSON.stringify(todos));
 //     }
-// })
+// });
+
+// createFormEl.addEventListener("submit", (e) => {
+//     e.preventDefault();
+//     const newTodo = new Todo(e.target.title.value, e.target.body.value);
+//     todos.push(newTodo);
+//     const columnFirst = todos.filter((todo) => todo.status === 0);
+//     renderTodos(todosNew, columnFirst);
+//     e.target.reset();
+//     window.localStorage.setItem("todos", JSON.stringify(todos));
+// });
+
+// function renderTodos(section, dataArray) {
+//     section.innerHTML = createTodosHTML(dataArray).join("");
+// }
+
+// function createTodosHTML(dataArray) {
+//     return dataArray.map((todo) => createTodoHTML(todo));
+// }
+
+// function createTodoHTML(todo) {
+//     let actionBtn = "";
+//     switch (todo.status) {
+//         case 0:
+//             actionBtn = `<button data-action="new">Set in progress!</button>`;
+//             break;
+//         case 1:
+//             actionBtn = `<button data-action="progress">Set in done!</button>`;
+//             break;
+//         case 2:
+//             actionBtn = `<button data-action="done">Delete!</button>`;
+//             break;
+//     }
+
+//     return `<div class="todoTask ${createTodoStatus(todo.status)}" data-id="${todo.id}">
+//                 <h2>${todo.title}</h2>
+//                 ${todo.body ? `<p>${todo.body}</p>` : ""}
+//                 <p>Status: ${createTodoStatus(todo.status)}</p>
+//                 <time>Created: ${new Date(todo.createdAt).toLocaleString()}</time>
+//                 ${todo.updatedAt ? `<time>Updated: ${new Date(todo.updatedAt).toLocaleString()}</time>` : ""}
+//                 ${actionBtn}
+//             </div>`;
+// }
+
+// function Todo(title, body) {
+//     this.id = Date.now();
+//     this.title = title;
+//     this.body = body;
+//     this.status = 0;
+//     this.createdAt = this.id;
+//     this.updatedAt = null;
+// }
+
+// function createTodoStatus(status) {
+//     if (!isNaN(Number(status))) {
+//         switch (Number(status)) {
+//             case 0:
+//                 return "new";
+//             case 1:
+//                 return "progress";
+//             case 2:
+//                 return "done";
+//             default:
+//                 throw "Unknown command";
+//         }
+//     } else {
+//         switch (status) {
+//             case "new":
+//                 return 0;
+//             case "progress":
+//                 return 1;
+//             case "done":
+//                 return 2;
+//             default:
+//                 throw "Unknown command";
+//         }
+//     }
+// }
+
+// function renderByTodos(dataArray, sectionFirst, sectionSecond, sectionThird) {
+//     const columnFirst = dataArray.filter((todo) => todo.status === 0);
+//     const columnSecond = dataArray.filter((todo) => todo.status === 1);
+//     const columnThird = dataArray.filter((todo) => todo.status === 2);
+//     renderTodos(sectionFirst, columnFirst);
+//     renderTodos(sectionSecond, columnSecond);
+//     renderTodos(sectionThird, columnThird);
+// }
